@@ -1,5 +1,23 @@
 pragma solidity ^0.4.25;
 
+contract ElectionFactory {
+    address[] public deployedElections;
+    string name;
+    string firstCandidate;
+    string secondCandidate;
+    address electionOwner = msg.sender;
+
+    function createElection(string memory name1, string memory theFirstCandidate, string memory theSecondCandidate, address theElectionOwner) public {
+       address newElection = new Election(name1, theFirstCandidate, theSecondCandidate, theElectionOwner);
+       deployedElections.push(newElection);
+    }
+
+    function getDeployedElections() public view returns (address[] memory) {
+        return deployedElections;
+    }
+
+}
+
 contract Election {
     address public owner;
     string public name;
@@ -19,8 +37,8 @@ contract Election {
     Candidate[] public candidates;
     mapping(address => Voter) public voters;
 
-    constructor(string _name, string _candidate1, string _candidate2) public {
-        owner = msg.sender;
+    function Election(string _name, string _candidate1, string _candidate2, address campaignOwner) public {
+        owner = campaignOwner;
         name = _name;
 
         candidates.push(Candidate(_candidate1, 0));
