@@ -89,6 +89,9 @@ contract Election {
     function unAuthorizeVoter(address _voter) public onlyOwner notVoted voterAuthorized{
         voters[_voter].authorized = false;
     }
+    function registerVoter(address _voter) public{
+        voters[_voter].authorized = false;
+    }
     function createConstituency(string memory _name, address _contituency) public onlyOwner {
         constituencies[_contituency].name = _name;
     }
@@ -131,4 +134,21 @@ contract Election {
             emit ElectionResult(candidates[i].name, candidates[i].voteCount);
         }
     }
+    
+    function getCandidateVoteCount(uint _candidate) public view returns(uint[]){
+        uint[] voteArray;
+        for(uint i=0; i < candidates.length; i++){
+            voteArray.push(candidates[i].voteCount);
+        }
+        return voteArray;
+    }
+    
+    function getCandidateCount(uint _candidate) public view returns(uint){
+        return candidates.length;
+    }
+    
+    
+    
+    
+    
 }
