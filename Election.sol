@@ -32,6 +32,7 @@ contract Election {
         bool authorized;
         bool voted;
         uint vote;
+        string constituency;
     }
 
     Candidate[] public candidates;
@@ -45,10 +46,11 @@ contract Election {
         candidates.push(Candidate(_candidate2, 0));
     }
 
-    function authorize(address _voter) public {
+    function authorize(address _voter, string _constituency) public {
         require(msg.sender == owner, "Only owner can authorize voting rights");
         require(!voters[_voter].voted, "Voter already voted");
         voters[_voter].authorized = true;
+        voters[_voter].constituency = _constituency;
     }
 
     function vote(uint _candidate) public {
