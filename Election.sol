@@ -39,10 +39,14 @@ contract Election {
         string constituency;
     }
 
+    struct Constituency {
+        string name;
+    }
+
     Candidate[] public candidates;
     //mapping(address => Candidate) public candidates;
     mapping(address => Voter) public voters;
-
+    mapping(address => Constituency) public constituencies; //Address of the constituency is used by the officer
     
     
     function Election(string memory _name, string memory _electionType, address campaignOwner) public {
@@ -69,6 +73,10 @@ contract Election {
         require(voters[msg.sender].authorized);
         _;
     }
+    // modifier onlyOfficer() {
+    //     require(isOfficer[msg.sender]);
+    //     _;
+    // }
 
     // =================================
     // Functions
@@ -81,7 +89,19 @@ contract Election {
     function unAuthorizeVoter(address _voter) public onlyOwner notVoted voterAuthorized{
         voters[_voter].authorized = false;
     }
+    function createConstituency(string memory _name, address _contituency) public onlyOwner {
+        constituencies[_contituency].name = _name;
+    }
+    function authorizeCandidate(string memory _name, uint _candidate, string memory _constituencyName, string memory  _affiliation) public  {
     
+        require(keccak256(constituencies[msg.sender].name) == keccak256(_constituencyName));
+        candidates[_candidate].name = _name;
+        candidates[_candidate].voteCount = 0;
+        candidates[_candidate].constituency = _constituencyName;
+        candidates[_candidate].affiliation = _affiliation;
+        candidates[_candidate].authorized = true;
+
+    }
     // pay candidate fee
     uint candidateFee = 0.10 ether;
 
