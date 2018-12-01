@@ -2,18 +2,24 @@ pragma solidity ^0.4.25;
 //import "./SafeMath.sol";
 contract ElectionFactory {
     address[] public deployedElections;
-    string name;
+    string[] public electionName;
     string electionType;
     address theElectionOwner = msg.sender;
 
     function createElection(string memory name, string memory electionType, address theElectionOwner) public {
        address newElection = new Election(name, electionType, theElectionOwner);
        deployedElections.push(newElection);
+       electionName.push(name);
     }
 
     function getDeployedElections() public view returns (address[] memory) {
         return deployedElections;
     }
+    
+    function getElectionCount() public view returns(uint){
+        return deployedElections.length;
+    }
+    
 
 }
 
