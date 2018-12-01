@@ -1,5 +1,5 @@
 pragma solidity ^0.4.25;
-
+//import "./SafeMath.sol";
 contract ElectionFactory {
     address[] public deployedElections;
     string name;
@@ -26,6 +26,10 @@ contract Election {
     struct Candidate {
         string name;
         uint voteCount;
+        string constituency;
+        string affiliation;
+        bool paidup;
+        bool authorized;
     }
 
     struct Voter {
@@ -36,8 +40,11 @@ contract Election {
     }
 
     Candidate[] public candidates;
+    //mapping(address => Candidate) public candidates;
     mapping(address => Voter) public voters;
 
+    
+    
     function Election(string memory _name, string memory _electionType, address campaignOwner) public {
         owner = campaignOwner;
         electionType = _electionType;
@@ -46,19 +53,37 @@ contract Election {
         // candidates.push(Candidate(_candidate1, 0));
         // candidates.push(Candidate(_candidate2, 0));
     }
+    
+    // =================================
+    // Events and modifiers
+    // =================================
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+    modifier notVoted() {
+        require(!voters[msg.sender].voted);
+        _;
+    }
+    modifier voterAuthorized() {
+        require(voters[msg.sender].authorized);
+        _;
+    }
 
-    function authorize(address _voter, string _constituency) public {
-        require(msg.sender == owner, "Only owner can authorize voting rights");
-        require(!voters[_voter].voted, "Voter already voted");
+    // =================================
+    // Functions
+    // =================================
+
+    function authorizeVoter(address _voter, string _constituency) public onlyOwner notVoted {
         voters[_voter].authorized = true;
         voters[_voter].constituency = _constituency;
     }
-
-    function vote(uint _candidate) public {
-        require(voters[msg.sender].authorized, "Not authorized to vote");
-        require(!voters[msg.sender].voted, "Voter already voted");
-        require(_candidate < candidates.length, "Not a valid candidate");
-
+    function unAuthorizeVoter(address _voter) public onlyOwner notVoted voterAuthorized{
+        voters[_voter].authorized = false;
+    }
+    function vote(uint _candidate) public notVoted voterAuthorized  {
+        require(candidates[_candidate].paidup);
+        require(candidates[_candidate].authorized);
         voters[msg.sender].vote = _candidate;
         voters[msg.sender].voted = true;
 
