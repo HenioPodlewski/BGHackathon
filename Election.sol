@@ -3,12 +3,11 @@ pragma solidity ^0.4.25;
 contract ElectionFactory {
     address[] public deployedElections;
     string name;
-    string firstCandidate;
-    string secondCandidate;
-    address electionOwner = msg.sender;
+    string electionType;
+    address theElectionOwner = msg.sender;
 
-    function createElection(string memory name1, string memory theFirstCandidate, string memory theSecondCandidate, address theElectionOwner) public {
-       address newElection = new Election(name1, theFirstCandidate, theSecondCandidate, theElectionOwner);
+    function createElection(string memory name, string memory electionType, address theElectionOwner) public {
+       address newElection = new Election(name, electionType, theElectionOwner);
        deployedElections.push(newElection);
     }
 
@@ -21,6 +20,7 @@ contract ElectionFactory {
 contract Election {
     address public owner;
     string public name;
+    string electionType;
     event ElectionResult(string candidateName, uint voteCount);
 
     struct Candidate {
@@ -38,12 +38,13 @@ contract Election {
     Candidate[] public candidates;
     mapping(address => Voter) public voters;
 
-    function Election(string _name, string _candidate1, string _candidate2, address campaignOwner) public {
+    function Election(string memory _name, string memory _electionType, address campaignOwner) public {
         owner = campaignOwner;
+        electionType = _electionType;
         name = _name;
 
-        candidates.push(Candidate(_candidate1, 0));
-        candidates.push(Candidate(_candidate2, 0));
+        // candidates.push(Candidate(_candidate1, 0));
+        // candidates.push(Candidate(_candidate2, 0));
     }
 
     function authorize(address _voter, string _constituency) public {
